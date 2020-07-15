@@ -160,6 +160,18 @@ public class AtmCoreTest {
         Assert.assertTrue(atmCore.deposit(0).contains("Can only deposit positive amounts of money."));
     }
 
+    @Test
+    public void testBalance() {
+        // log in
+        Mockito.when(atmService.authorize(accountId, accountPin)).thenReturn(true);
+        atmCore.login(accountId, accountPin);
+
+        double balance = 20;
+
+        Mockito.when(atmService.balance(accountId)).thenReturn(balance);
+        Assert.assertTrue(atmCore.balance().contains("Current balance: " + balance));
+    }
+
     private String doSuccessfulWithdrawal(int amountRequested, int amountDispensible, double balanceAfterTransaction, double overdraftFee) {
         // log in
         Mockito.when(atmService.authorize(accountId, accountPin)).thenReturn(true);

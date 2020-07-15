@@ -108,7 +108,7 @@ public class AtmConsoleInterface {
             System.out.println("usage: balance");
             return;
         }
-//        System.out.println(atmCore.balance());
+        System.out.println(atmCore.balance());
     }
 
     private static void attemptHistory(String[] command, AtmCore atmCore) {

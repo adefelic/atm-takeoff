@@ -97,8 +97,8 @@ public class AtmCore {
         return "Current balance: " + transactionRecord.balance;
     }
 
-    public void balance() {
-        //todo
+    public String balance() {
+        return "Current balance: " + atmService.balance(currentLoggedInAccountId);
     }
     public void history() {
         //todo
