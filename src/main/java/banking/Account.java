@@ -1,12 +1,13 @@
 package banking;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Account {
     private final String id;
     private final String pin;
     private double balance;
-    private List<TransactionRecord> transactionHistory;
+    private List<TransactionRecord> transactionHistory = new ArrayList<>();
 
     public Account(String id, String pin, double balance) {
         this.id = id;

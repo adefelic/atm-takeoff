@@ -10,10 +10,17 @@ import machine.AtmMachine;
 public class AtmCore {
 
     private static final long LOGIN_TIMEOUT_MS = 1000 * 60 * 2;
-    private final AtmService atmService = new AtmService();
-    private final AtmMachine atmMachine = new AtmMachine(10000);
+    private ITimeSource timeSource;
+    private final AtmMachine atmMachine;
+    private final AtmService atmService;
     private String currentLoggedInAccountId; // this is set to null if there isn't an active login
     private long lastInteractionTimestamp;
+
+    public AtmCore(ITimeSource timeSource, AtmService atmService, AtmMachine atmMachine) {
+        this.timeSource = timeSource;
+        this.atmService = atmService;
+        this.atmMachine = atmMachine;
+    }
 
     public String login(String accountId, String pin) {
         if (atmService.authorize(accountId, pin)) {
@@ -34,7 +41,7 @@ public class AtmCore {
     }
 
     public boolean hasLogin() {
-        return currentLoggedInAccountId != null && lastInteractionTimestamp + LOGIN_TIMEOUT_MS < System.currentTimeMillis();
+        return currentLoggedInAccountId != null && lastInteractionTimestamp + LOGIN_TIMEOUT_MS > timeSource.currentTimeMillis();
     }
 
     public String withdraw(int requestedAmount) {
@@ -65,7 +72,7 @@ public class AtmCore {
             if (transactionRecord.overdraftFee > 0) {
                 stringBuilder.append("You have been charged an overdraft fee of $");
                 stringBuilder.append(transactionRecord.overdraftFee);
-                stringBuilder.append(" ");
+                stringBuilder.append(". ");
             }
             stringBuilder.append("Current balance: ");
             stringBuilder.append(transactionRecord.balance);
