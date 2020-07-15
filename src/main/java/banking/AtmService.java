@@ -56,9 +56,18 @@ public class AtmService {
         return transactionRecord;
     }
 
-    public void deposit(String accountId, int amount) {
+    public TransactionRecord deposit(String accountId, int amount) {
         // todo require auth token
+        if (amount <= 0 || !accounts.containsKey(accountId)) {
+            return NO_TRANSACTION;
+        }
+        Account account = accounts.get(accountId);
+        double balance = account.getBalance();
+        account.setBalance(balance + amount);
 
+        TransactionRecord transactionRecord = new TransactionRecord(timeSource.currentTimeMillis(), amount, account.getBalance(), 0);
+        account.recordTransaction(transactionRecord);
+        return transactionRecord;
     }
 
     public double balance(String accountId) {

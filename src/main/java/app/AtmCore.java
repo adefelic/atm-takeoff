@@ -45,6 +45,10 @@ public class AtmCore {
     }
 
     public String withdraw(int requestedAmount) {
+        if (requestedAmount <= 0) {
+            return "Can only withdraw positive amounts of money.";
+        }
+
         if (requestedAmount % 20 != 0) {
             return "Only multiples of 20 may be withdrawn.";
         }
@@ -76,16 +80,23 @@ public class AtmCore {
             }
             stringBuilder.append("Current balance: ");
             stringBuilder.append(transactionRecord.balance);
-            stringBuilder.append("\n");
 
             return stringBuilder.toString();
         }
         return "No transaction (something went wrong in the AtmService)";
     }
 
-    public void deposit(double value) {
-        //todo
+    public String deposit(int amountToDeposit) {
+        // deposits can only fail if input is bad
+        if (amountToDeposit <= 0) {
+            return "Can only deposit positive amounts of money.";
+        }
+
+        TransactionRecord transactionRecord = atmService.deposit(currentLoggedInAccountId, amountToDeposit);
+        atmMachine.receiveMoney(amountToDeposit);
+        return "Current balance: " + transactionRecord.balance;
     }
+
     public void balance() {
         //todo
     }

@@ -93,7 +93,7 @@ public class AtmConsoleInterface {
         }
         try {
             int amountToDeposit = Integer.parseInt(command[1]);
-//            System.out.println(atmCore.deposit(amountToDeposit));
+            System.out.println(atmCore.deposit(amountToDeposit));
         } catch (NumberFormatException e) {
             System.out.println("\"" + command[1] + "\"" + "not parsable as integer");
         }

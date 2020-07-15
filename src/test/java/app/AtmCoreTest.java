@@ -128,6 +128,38 @@ public class AtmCoreTest {
         Assert.assertTrue(withdrawalResponseMessage.contains("You have been charged an overdraft fee of $5"));
     }
 
+    @Test
+    public void testDepositSuccessful() {
+        // log in
+        Mockito.when(atmService.authorize(accountId, accountPin)).thenReturn(true);
+        atmCore.login(accountId, accountPin);
+
+        int amountToDeposit = 20;
+        int newBalance = 40;
+        Mockito.when(atmService.deposit(accountId, amountToDeposit)).thenReturn(
+                new TransactionRecord(0, amountToDeposit, newBalance, 0));
+
+        Assert.assertTrue(atmCore.deposit(amountToDeposit).contains("Current balance: " + newBalance));
+    }
+
+    @Test
+    public void testDepositZero() {
+        // log in
+        Mockito.when(atmService.authorize(accountId, accountPin)).thenReturn(true);
+        atmCore.login(accountId, accountPin);
+
+        Assert.assertTrue(atmCore.deposit(0).contains("Can only deposit positive amounts of money."));
+    }
+
+    @Test
+    public void testDepositNegative() {
+        // log in
+        Mockito.when(atmService.authorize(accountId, accountPin)).thenReturn(true);
+        atmCore.login(accountId, accountPin);
+
+        Assert.assertTrue(atmCore.deposit(0).contains("Can only deposit positive amounts of money."));
+    }
+
     private String doSuccessfulWithdrawal(int amountRequested, int amountDispensible, double balanceAfterTransaction, double overdraftFee) {
         // log in
         Mockito.when(atmService.authorize(accountId, accountPin)).thenReturn(true);

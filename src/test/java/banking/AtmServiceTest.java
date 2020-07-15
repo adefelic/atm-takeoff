@@ -37,9 +37,11 @@ public class AtmServiceTest {
     public void testWithdrawSuccessfulWithdrawal() {
         // atmService has the following account: Account(id: "2001377812", pin: "5950", balance: 60.)
         String accountId = "2001377812";
+        Assert.assertEquals(60., atmService.balance(accountId), 0);
         Assert.assertEquals(
                 new TransactionRecord(0, 20, 40,0),
                 atmService.withdraw(accountId, 20));
+        Assert.assertEquals(40., atmService.balance(accountId), 0);
     }
 
     @Test
@@ -49,6 +51,8 @@ public class AtmServiceTest {
         Assert.assertEquals(
                 new TransactionRecord(0, 60, 0,0),
                 atmService.withdraw(accountId, 60));
+        Assert.assertEquals(0, atmService.balance(accountId), 0);
+
     }
 
     @Test
@@ -58,10 +62,12 @@ public class AtmServiceTest {
         Assert.assertEquals(
                 new TransactionRecord(0, 80, -25,5),
                 atmService.withdraw(accountId, 80));
+        Assert.assertEquals(-25, atmService.balance(accountId), 0);
+
     }
 
     @Test
-    public void testWithdrawUnsuccesfulWithdrawalNoFunds() {
+    public void testWithdrawUnsuccessfulWithdrawalNoFunds() {
         // atmService has the following account: Account(id: "2001377812", pin: "5950", balance: 60.)
         String accountId = "2001377812";
         // empty the account
@@ -100,5 +106,31 @@ public class AtmServiceTest {
         Assert.assertEquals(
                 TransactionRecord.NO_TRANSACTION,
                 atmService.withdraw(accountId, -60));
+    }
+
+    @Test
+    public void testDepositZero() {
+        String accountId = "2001377812";
+        Assert.assertEquals(
+                TransactionRecord.NO_TRANSACTION,
+                atmService.deposit(accountId, 0));
+    }
+
+    @Test
+    public void testDepositNegative() {
+        String accountId = "2001377812";
+        Assert.assertEquals(
+                TransactionRecord.NO_TRANSACTION,
+                atmService.deposit(accountId, -10));
+    }
+
+    @Test
+    public void testDepositSuccessful() {
+        String accountId = "2001377812";
+        Assert.assertEquals(60., atmService.balance(accountId), 0);
+        Assert.assertEquals(
+                new TransactionRecord(0, 20, 80,0),
+                atmService.deposit(accountId, 20));
+        Assert.assertEquals(80., atmService.balance(accountId), 0);
     }
 }

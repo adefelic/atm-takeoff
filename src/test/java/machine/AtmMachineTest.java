@@ -13,19 +13,11 @@ public class AtmMachineTest {
         atmMachine = new AtmMachine(100);
     }
 
-
-    @Test
-    public void testCanReceiveAmount() {
-        Assert.assertEquals(100, atmMachine.getDollarsInMachine());
-        Assert.assertTrue(atmMachine.canReceiveAmount(100));
-        Assert.assertTrue(atmMachine.canReceiveAmount(19900));
-        Assert.assertFalse(atmMachine.canReceiveAmount(19901));
-    }
-
     @Test
     public void testReceiveMoney() {
         Assert.assertEquals(100, atmMachine.getDollarsInMachine());
-        Assert.assertTrue(atmMachine.receiveMoney(100));
+        atmMachine.receiveMoney(100);
+        Assert.assertEquals(200, atmMachine.getDollarsInMachine());
     }
 
     @Test

@@ -4,7 +4,6 @@ package machine;
  * Represents the state of the physical ATM machine and its money reserves
  */
 public class AtmMachine {
-    static final int MAX_DOLLARS_IN_MACHINE = 20000; // there has to be a max
     private int dollarsInMachine;
 
     public AtmMachine(int dollarsInMachine) {
@@ -16,12 +15,8 @@ public class AtmMachine {
     /**
      * @return if operation was successful
      */
-    public boolean receiveMoney(int dollarsToReceive) {
-        if (canReceiveAmount(dollarsToReceive)) {
-            dollarsInMachine += dollarsToReceive;
-            return true;
-        }
-        return false;
+    public void receiveMoney(int dollarsToReceive) {
+        dollarsInMachine += dollarsToReceive;
     }
 
     /**
@@ -51,10 +46,6 @@ public class AtmMachine {
             return dollarsInMachine;
         }
         return targetDollarValue;
-    }
-
-    public boolean canReceiveAmount(int dollarsToReceive) {
-        return dollarsInMachine + dollarsToReceive <= MAX_DOLLARS_IN_MACHINE;
     }
 
     // visible for testing (google has an annotation for this that i'm not importing)
