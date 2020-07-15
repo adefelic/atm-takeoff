@@ -9,6 +9,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AtmCoreTest {
 
     private AtmCore atmCore;
@@ -172,6 +175,30 @@ public class AtmCoreTest {
         Assert.assertTrue(atmCore.balance().contains("Current balance: " + balance));
     }
 
+    @Test
+    public void testHistoryNone() {
+        // log in
+        Mockito.when(atmService.authorize(accountId, accountPin)).thenReturn(true);
+        atmCore.login(accountId, accountPin);
+
+        Mockito.when(atmService.history(accountId)).thenReturn(new ArrayList<>());
+        Assert.assertTrue(atmCore.history().contains("No history found."));
+    }
+
+    @Test
+    public void testHistory() {
+        // log in
+        Mockito.when(atmService.authorize(accountId, accountPin)).thenReturn(true);
+        atmCore.login(accountId, accountPin);
+
+        List<TransactionRecord> history = new ArrayList<>();
+        history.add(0, new TransactionRecord(1594850601641L, 20, 80, 0));
+        history.add(0, new TransactionRecord(1594851601641L, -100, -25, 5));
+
+        Mockito.when(atmService.history(accountId)).thenReturn(history);
+        Assert.assertTrue(atmCore.history().contains("2020/07/15 18:20:01 -100.0 -25.0\n2020/07/15 18:03:21 20.0 80.0"));
+    }
+
     private String doSuccessfulWithdrawal(int amountRequested, int amountDispensible, double balanceAfterTransaction, double overdraftFee) {
         // log in
         Mockito.when(atmService.authorize(accountId, accountPin)).thenReturn(true);
@@ -181,7 +208,7 @@ public class AtmCoreTest {
         Mockito.when(atmMachine.getDispensibleAmountOfTargetValue(amountRequested)).thenReturn(amountDispensible);
 
         Mockito.when(atmService.withdraw(accountId, amountDispensible)).thenReturn(
-                new TransactionRecord(Mockito.anyLong(), amountDispensible, balanceAfterTransaction, overdraftFee));
+                new TransactionRecord(Mockito.anyLong(), amountDispensible * -1, balanceAfterTransaction, overdraftFee));
         Mockito.when(atmMachine.dispenseMoney(amountDispensible)).thenReturn(amountDispensible);
 
         return atmCore.withdraw(amountRequested);

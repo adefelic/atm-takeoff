@@ -120,7 +120,7 @@ public class AtmConsoleInterface {
             System.out.println("usage: history");
             return;
         }
-//        System.out.println(atmCore.history());
+        System.out.println(atmCore.history());
     }
 
     private static void attemptLogout(String[] command, AtmCore atmCore) {

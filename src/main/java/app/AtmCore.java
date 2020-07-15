@@ -4,6 +4,11 @@ import banking.AtmService;
 import banking.TransactionRecord;
 import machine.AtmMachine;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 /**
  * AtmCore holds business logic that uses both remote banking services (AtmService) and local machine information (AtmMachine)
  */
@@ -71,7 +76,7 @@ public class AtmCore {
                 stringBuilder.append("Unable to dispense full amount requested at this time.\n");
             }
             stringBuilder.append("Amount dispensed: ");
-            stringBuilder.append(transactionRecord.amount);
+            stringBuilder.append(transactionRecord.amount * -1);
             stringBuilder.append("\n");
             if (transactionRecord.overdraftFee > 0) {
                 stringBuilder.append("You have been charged an overdraft fee of $");
@@ -100,8 +105,26 @@ public class AtmCore {
     public String balance() {
         return "Current balance: " + atmService.balance(currentLoggedInAccountId);
     }
-    public void history() {
-        //todo
+
+    public String history() {
+        List<TransactionRecord> history = atmService.history(currentLoggedInAccountId);
+        if (history.size() == 0) {
+            return "No history found.";
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss");
+
+        for (TransactionRecord record : history) {
+            stringBuilder.append(
+                    formatter.format(Instant.ofEpochMilli(record.timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime()));
+            stringBuilder.append(" ");
+            stringBuilder.append(record.amount);
+            stringBuilder.append(" ");
+            stringBuilder.append(record.balance);
+            stringBuilder.append("\n");
+        }
+        return stringBuilder.toString();
     }
 
     public void setLastInteractionTimestamp(long lastInteractionTimestamp) {

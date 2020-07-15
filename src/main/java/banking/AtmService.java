@@ -3,6 +3,7 @@ package banking;
 import app.ITimeSource;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static banking.TransactionRecord.NO_TRANSACTION;
@@ -51,7 +52,7 @@ public class AtmService {
         }
         boolean isOverdraw = balance - amount < 0.;
         account.setBalance(balance - amount - (isOverdraw ? OVERDRAFT_FEE : 0.));
-        TransactionRecord transactionRecord = new TransactionRecord(timeSource.currentTimeMillis(), amount, account.getBalance(), (isOverdraw ? OVERDRAFT_FEE : 0.));
+        TransactionRecord transactionRecord = new TransactionRecord(timeSource.currentTimeMillis(), amount * -1, account.getBalance(), (isOverdraw ? OVERDRAFT_FEE : 0.));
         account.recordTransaction(transactionRecord);
         return transactionRecord;
     }
@@ -78,8 +79,11 @@ public class AtmService {
         return -1.;
     }
 
-    public void history(String accountId) {
+    public List<TransactionRecord> history(String accountId) {
         // todo require auth token
-
+        if (accounts.containsKey(accountId)) {
+            return accounts.get(accountId).getTransactionHistory();
+        }
+        return null;
     }
 }

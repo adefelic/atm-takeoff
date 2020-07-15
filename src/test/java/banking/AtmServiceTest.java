@@ -4,6 +4,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AtmServiceTest {
 
     AtmService atmService;
@@ -39,7 +42,7 @@ public class AtmServiceTest {
         String accountId = "2001377812";
         Assert.assertEquals(60., atmService.balance(accountId), 0);
         Assert.assertEquals(
-                new TransactionRecord(0, 20, 40,0),
+                new TransactionRecord(0, -20, 40,0),
                 atmService.withdraw(accountId, 20));
         Assert.assertEquals(40., atmService.balance(accountId), 0);
     }
@@ -49,7 +52,7 @@ public class AtmServiceTest {
         // atmService has the following account: Account(id: "2001377812", pin: "5950", balance: 60.)
         String accountId = "2001377812";
         Assert.assertEquals(
-                new TransactionRecord(0, 60, 0,0),
+                new TransactionRecord(0, -60, 0,0),
                 atmService.withdraw(accountId, 60));
         Assert.assertEquals(0, atmService.balance(accountId), 0);
 
@@ -60,7 +63,7 @@ public class AtmServiceTest {
         // atmService has the following account: Account(id: "2001377812", pin: "5950", balance: 60.)
         String accountId = "2001377812";
         Assert.assertEquals(
-                new TransactionRecord(0, 80, -25,5),
+                new TransactionRecord(0, -80, -25,5),
                 atmService.withdraw(accountId, 80));
         Assert.assertEquals(-25, atmService.balance(accountId), 0);
 
@@ -72,7 +75,7 @@ public class AtmServiceTest {
         String accountId = "2001377812";
         // empty the account
         Assert.assertEquals(
-                new TransactionRecord(0, 60, 0,0),
+                new TransactionRecord(0, -60, 0,0),
                 atmService.withdraw(accountId, 60));
 
         // now fail to withdraw
@@ -132,5 +135,31 @@ public class AtmServiceTest {
                 new TransactionRecord(0, 20, 80,0),
                 atmService.deposit(accountId, 20));
         Assert.assertEquals(80., atmService.balance(accountId), 0);
+    }
+
+    @Test
+    public void testHistorySuccessful() {
+        String accountId = "2001377812";
+
+        // empty history
+        List<TransactionRecord> expected = new ArrayList<>();
+        assertTransactionHistoryEquals(expected, atmService.history(accountId));
+
+        // simulate a deposit (account begins with balance of 60)
+        atmService.deposit(accountId, 20);
+        expected.add(0, new TransactionRecord(0, 20, 80, 0));
+        assertTransactionHistoryEquals(expected, atmService.history(accountId));
+
+        // simulate a withdrawal
+        atmService.withdraw(accountId, 100);
+        expected.add(0, new TransactionRecord(0, -100, -25, 5));
+        assertTransactionHistoryEquals(expected, atmService.history(accountId));
+    }
+
+    private void assertTransactionHistoryEquals(List<TransactionRecord> expected, List<TransactionRecord> actual) {
+        Assert.assertEquals(expected.size(), actual.size());
+        for (int i = 0; i < expected.size(); i++) {
+            Assert.assertEquals(expected.get(i), actual.get(i));
+        }
     }
 }
